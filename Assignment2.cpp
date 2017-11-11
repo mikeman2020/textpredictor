@@ -1,77 +1,76 @@
 // Assignment2.cpp : Defines the entry point for the console application.
 //
-#include "stdafx.h"
-#include <stdio.h>
-#include <stdlib.h>
 
-typedef struct node {
-	int    data;
-	node*	left;
-	node*   right;
-}Node;
+#include "stdafx.h"
+#include <stdlib.h>
+#include "string.h"
+
+typedef struct Node {
+	char data;
+	Node* next;
+} node;
 
 typedef struct {
-	node* root;
-}Head;
+	int count;
+	node* head;
+} ListHead;
 
-//Create empty dictionary tree
-Head* CreateTree() {
-	Head* myTree = new Head;
-	myTree->root = NULL;
-	return myTree;
+
+ListHead *CreateTree() {
+	ListHead *myLH = new ListHead;
+	// Empty list is created.
+	// Element counter is set to zero
+	myLH->count = 0;
+	// Top should address NULL as it is an empty list
+	myLH->head = NULL;
+	return myLH;
 }
 
-//rec
-int AddNodeRecursive(Node* addnode, char data) {
-	if (data < addnode->data)
-		if (addnode->left == NULL) {
-			// place the node on the left
-			Node* pNew = new Node;
-			pNew->data = data;
-			pNew->left = NULL;
-			pNew->right = NULL;
-			addnode->left = pNew;
-		}
-		else {
-			AddNodeRecursive(addnode->left, data);
-		}
+bool AddWordRecursive(node *aList, char letter) {
 
-	else {
-		if (addnode->right == NULL) {
-			//place node on the right
-			Node* pNew = new Node;
-			pNew->data = data;
-			pNew->left = NULL;
-			pNew->right = NULL;
-			addnode->right = pNew;
-		}
-		else {
-			AddNodeRecursive(addnode->right, data);
-		}
-	}
-
-}
-
-//Function to add new node(a letter) to tree
-void AddNode(Head* myTree, char data) {
-	if (myTree->root == NULL) {
+	if (aList->data == NULL) {
 		Node* pNew = new Node;
-		pNew->data = data;
-		pNew->left = NULL;
-		pNew->right = NULL;
-		myTree->root = pNew;
+		pNew->data = letter;
+		ListHead *newList = CreateTree();
+		pNew->next = newList->head;
+		aList = pNew;
 	}
-	else
-		AddNodeRecursive(myTree->root, data);
+	else {
+		AddWordRecursive(aList->next, letter);
+		return true;
+	}
+
 }
 
+int AddWord(ListHead* aTree, char *word) {
 
+	for (int i = 0; i < strlen(word); i++) {
+
+		if (aTree->head == NULL) {
+			Node* pNew = new Node;
+			pNew->data = word[i];
+			ListHead *newList = CreateTree();
+			pNew->next = newList->head;
+			aTree->head = pNew;
+		}
+		else {
+			char *pWord = &word[i];
+			Node *nextList = aTree->head->next;
+			AddWordRecursive(aTree->head->next, word[i]);
+			if (AddWordRecursive(aTree->head->next, word[i])) {
+				printf("word added\n");
+				return 1;
+			}
+		}
+
+	}
+}
 
 int main()
 {
-	Head* dictionaryTree = CreateTree();
-
-
+	ListHead *aList = CreateTree();
+	AddWord(aList, "ACT");
 	system("pause");
-	return 0;
+    return 0;
 }
+
